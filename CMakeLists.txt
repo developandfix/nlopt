@@ -183,18 +183,23 @@ endif ()
 #==============================================================================
 
 set (NLOPT_HEADERS
-  src/api/nlopt.h ${PROJECT_BINARY_DIR}/nlopt.hpp ${PROJECT_BINARY_DIR}/nlopt.f
+  src/api/nlopt.h ${PROJECT_BINARY_DIR}/nlopt.hpp
 )
+if (NLOPT_FORTRAN)
+  set(NLOPT_HEADERS ${NLOPT_HEADERS} ${PROJECT_BINARY_DIR}/nlopt.f)
+endif()
 
 add_custom_command (OUTPUT nlopt.hpp
   COMMAND ${CMAKE_COMMAND} -DAPI_SOURCE_DIR=${PROJECT_SOURCE_DIR}/src/api -P ${PROJECT_SOURCE_DIR}/cmake/generate-cpp.cmake
   MAIN_DEPENDENCY src/api/nlopt-in.hpp)
 add_custom_target (generate-cpp ALL DEPENDS nlopt.hpp)
 
-add_custom_command (OUTPUT nlopt.f
-  COMMAND ${CMAKE_COMMAND} -DAPI_SOURCE_DIR=${PROJECT_SOURCE_DIR}/src/api -P ${PROJECT_SOURCE_DIR}/cmake/generate-fortran.cmake
-  MAIN_DEPENDENCY src/api/nlopt.h)
-add_custom_target (generate-fortran ALL DEPENDS nlopt.f)
+if (NLOPT_FORTRAN)
+  add_custom_command (OUTPUT nlopt.f
+    COMMAND ${CMAKE_COMMAND} -DAPI_SOURCE_DIR=${PROJECT_SOURCE_DIR}/src/api -P ${PROJECT_SOURCE_DIR}/cmake/generate-fortran.cmake
+    MAIN_DEPENDENCY src/api/nlopt.h)
+  add_custom_target (generate-fortran ALL DEPENDS nlopt.f)
+endif()
 
 set (NLOPT_SOURCES
   src/algs/direct/DIRect.c src/algs/direct/direct_wrap.c src/algs/direct/DIRserial.c src/algs/direct/DIRsubrout.c src/algs/direct/direct-internal.h src/algs/direct/direct.h
