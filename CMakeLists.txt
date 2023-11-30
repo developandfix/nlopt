@@ -74,8 +74,8 @@ foreach (p LIB BIN INCLUDE DATA CMAKE)
 endforeach ()
 
 
-set (CMAKE_INSTALL_RPATH ${INSTALL_LIB_DIR})
-set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set (CMAKE_INSTALL_RPATH ${INSTALL_LIB_DIR} CACHE PATH "rpath")
+set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE CACHE BOOL "use link path")
 if(POLICY CMP0042)
   # Set MACOSX_RPATH to ON
   cmake_policy(SET CMP0042 NEW)
@@ -90,6 +90,7 @@ include (CheckFunctionExists)
 include (CheckTypeSize)
 include (CheckCCompilerFlag)
 include (CheckCXXSymbolExists)
+include (CheckCSourceCompiles)
 include (CheckCXXCompilerFlag)
 include (CheckLibraryExists)
 
@@ -121,6 +122,7 @@ check_type_size ("unsigned long" SIZEOF_UNSIGNED_LONG)
 check_library_exists ("m" sqrt "" HAVE_LIBM)
 if (HAVE_LIBM)
   set (M_LIBRARY m)
+  set (LIBS_PRIVATE "-l${M_LIBRARY}")
 endif()
 
 if (NOT DEFINED HAVE_FPCLASSIFY)
@@ -173,10 +175,8 @@ endif ()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/nlopt_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/nlopt_config.h IMMEDIATE)
 
 # pkgconfig file
-if (UNIX OR MINGW)
-  configure_file (${CMAKE_CURRENT_SOURCE_DIR}/nlopt.pc.in ${CMAKE_CURRENT_BINARY_DIR}/nlopt.pc @ONLY)
-  install (FILES ${CMAKE_CURRENT_BINARY_DIR}/nlopt.pc DESTINATION ${RELATIVE_INSTALL_LIB_DIR}/pkgconfig)
-endif ()
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/nlopt.pc.in ${CMAKE_CURRENT_BINARY_DIR}/nlopt.pc @ONLY)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/nlopt.pc DESTINATION ${RELATIVE_INSTALL_LIB_DIR}/pkgconfig)
 
 #==============================================================================
 # nlopt LIBRARY TARGET (SHARED OR STATIC)
